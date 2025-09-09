@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test de Connexion</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #status {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      width: 250px;
+    }
+    .online {
+      background-color: #c8f7c5;
+      color: #2e7d32;
+      border: 2px solid #2e7d32;
+    }
+    .offline {
+      background-color: #ffc9c9;
+      color: #c62828;
+      border: 2px solid #c62828;
+    }
+    #iframe-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.80);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #iframe-overlay iframe {
+      width: 90vw;
+      height: 90vh;
+      border: none;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      display: block;
+    }
+    dialog {
+      border-radius: 8px;
+      box-shadow: 0 0 10px #0003;
+      border: none;
+      padding: 20px;
+    }
+    dialog input {
+      width: 350px;
+      padding: 6px 12px;
+      margin-bottom: 12px;
+      font-size: 1em;
+    }
+    dialog button {
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+<h1>Test de Connexion (API navigateur)</h1>
+<div id="status">Test en cours…</div>
+
+<dialog id="siteDialog">
+  <form method="dialog" id="siteForm">
+    <label for="siteUrl">URL du site à afficher&nbsp;:</label><br>
+    <input id="siteUrl" name="siteUrl" type="url" placeholder="https://..." required autofocus>
+    <div style="margin-top:10px;text-align:right">
+      <button type="submit">Valider</button>
+      <button type="button" id="cancelBtn">Annuler</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="iframe-overlay">
+  <iframe id="siteFrame"></iframe>
+</div>
+
+<script>
+  const statusDiv = document.getElementById('status');
+  function updateStatus() {
+    if (navigator.onLine) {
+      statusDiv.textContent = 'Connexion en ligne';
+      statusDiv.className = 'online';
+    } else {
+      statusDiv.textContent = 'Connexion hors ligne';
+      statusDiv.className = 'offline';
+    }
+  }
+  window.addEventListener('online', updateStatus);
+  window.addEventListener('offline', updateStatus);
+  setInterval(updateStatus,10000);
+  updateStatus();
+
+  let iframeOpen = false;
+  const dialog = document.getElementById('siteDialog');
+  const siteForm = document.getElementById('siteForm');
+  const overlay = document.getElementById('iframe-overlay');
+  const iframe = document.getElementById('siteFrame');
+  const siteUrlInput = document.getElementById('siteUrl');
+  const cancelBtn = document.getElementById('cancelBtn');
+
+  function openDialog() {
+    dialog.showModal();
+    setTimeout(() => siteUrlInput.focus(), 50);
+  }
+  function closeDialog() {
+    dialog.close();
+  }
+  function openIframe(url) {
+    iframe.src = url;
+    overlay.style.display = 'flex';
+    iframeOpen = true;
+  }
+  function closeIframe() {
+    overlay.style.display = 'none';
+    iframe.src = "";
+    iframeOpen = false;
+  }
+
+  window.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === "m" || e.key === "M")) {
+      e.preventDefault();
+      if (iframeOpen) {
+        closeIframe();
+      } else if (!dialog.open) {
+        openDialog();
+      } else {
+        closeDialog();
+      }
+    }
+  });
