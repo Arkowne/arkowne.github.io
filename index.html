@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Iframe vers serveur local</title>
+  <title>Iframe conditionnelle</title>
   <style>
     html, body {
       margin: 0;
@@ -20,17 +20,20 @@
   <iframe id="dynamicFrame"></iframe>
 
   <script>
-    // URL de base du serveur local
     const localServer = "https://[2a02:842b:db00:b101:64de:57ee:ea76:2250]:4567";
 
-    // On récupère le path et la query de la page actuelle
-    const currentPath = window.location.pathname; // /versus/lapage.html/gam
-    const currentQuery = window.location.search;  // ?qqch
+    // Récupère la query string
+    const params = new URLSearchParams(window.location.search);
+    let iframePath = window.location.pathname + window.location.search;
 
-    // On construit l'URL complète pour l'iframe
-    const iframeUrl = localServer + currentPath + currentQuery;
+    // Si ?page=game, on redirige vers /game sur le serveur local
+    if (params.get("page") === "game") {
+      iframePath = "/game";
+    }
 
-    // On met l'iframe à jour
+    // URL finale pour l'iframe
+    const iframeUrl = localServer + iframePath;
+
     document.getElementById('dynamicFrame').src = iframeUrl;
 
     console.log("Iframe URL:", iframeUrl);
