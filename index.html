@@ -1,42 +1,39 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Iframe conditionnelle</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Iframe dynamique</title>
+<style>
+  body, html { margin:0; height:100%; }
+  iframe { width:100%; height:100%; border:none; }
+</style>
 </head>
 <body>
-  <iframe id="dynamicFrame"></iframe>
 
-  <script>
-    const localServer = "https://[2a02:842b:db00:b101:64de:57ee:ea76:2250]:4567";
+<iframe id="dynamicIframe"></iframe>
 
-    // Récupère la query string
-    const params = new URLSearchParams(window.location.search);
-    let iframePath = window.location.pathname + window.location.search;
+<script>
+(function() {
+  const iframe = document.getElementById("dynamicIframe");
 
-    // Si ?page=game, on redirige vers /game sur le serveur local
-    if (params.get("page") === "game") {
-      iframePath = "/game";
-    }
+  // Récupère le path et la query string
+  let path = window.location.pathname; // /versus/mapage.html/load_quiz/a8215ebc
+  const search = window.location.search; // ?qqch
 
-    // URL finale pour l'iframe
-    const iframeUrl = localServer + iframePath;
+  // Supprime "mapage.html" du path
+  path = path.replace(/\/[^\/]*\.html/, "");
 
-    document.getElementById('dynamicFrame').src = iframeUrl;
+  // Vérifie si ?page=game → redirige vers /game
+  const params = new URLSearchParams(search);
+  if (params.get("page") === "game") {
+    path = "/game";
+  }
 
-    console.log("Iframe URL:", iframeUrl);
-  </script>
+  // Construit l'URL finale pour l'iframe
+  const iframeUrl = `https://[2a02:842b:db00:b101:64de:57ee:ea76:2250]:4567${path}${search}`;
+  iframe.src = iframeUrl;
+})();
+</script>
+
 </body>
 </html>
