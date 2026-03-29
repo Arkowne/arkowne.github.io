@@ -2,37 +2,34 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Iframe dynamique</title>
+<title>Redirection iframe</title>
 <style>
-  body, html { margin:0; height:100%; }
-  iframe { width:100%; height:100%; border:none; }
+  html, body { margin: 0; height: 100%; }
+  iframe { width: 100%; height: 100%; border: none; }
 </style>
 </head>
 <body>
 
-<iframe id="dynamicIframe"></iframe>
-
 <script>
-(function() {
-  const iframe = document.getElementById("dynamicIframe");
+  // Récupère les paramètres de l'URL
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get("page");
+  const id   = params.get("id");
 
-  // Récupère le path et la query string
-  let path = window.location.pathname; // /versus/mapage.html/load_quiz/a8215ebc
-  const search = window.location.search; // ?qqch
+  let iframeUrl = "";
 
-  // Supprime "mapage.html" du path
-  path = path.replace(/\/[^\/]*\.html/, "");
-
-  // Vérifie si ?page=game → redirige vers /game
-  const params = new URLSearchParams(search);
-  if (params.get("page") === "game") {
-    path = "/game";
+  if (page === "game") {
+    iframeUrl = "https://[2a02:842b:db00:b101:64de:57ee:ea76:2250]:4567/game";
+  } else if (page === "load_quiz" && id) {
+    iframeUrl = `https://[2a02:842b:db00:b101:64de:57ee:ea76:2250]:4567/load_quiz/${id}`;
+  } else {
+    iframeUrl = "https://[2a02:842b:db00:b101:64de:57ee:ea76:2250]:4567/";
   }
 
-  // Construit l'URL finale pour l'iframe
-  const iframeUrl = `https://[2a02:842b:db00:b101:64de:57ee:ea76:2250]:4567${path}${search}`;
+  // Crée et insère l'iframe
+  const iframe = document.createElement("iframe");
   iframe.src = iframeUrl;
-})();
+  document.body.appendChild(iframe);
 </script>
 
 </body>
