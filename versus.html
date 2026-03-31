@@ -89,8 +89,8 @@
     createIframe(p.url, p.title, p.icon);
 
   } else {
-    // MENU
-    setMeta("Menu - Playlist Battle", "https://cdn-icons-png.flaticon.com/512/1828/1828859.png");
+    const p = pages.quiz(id);
+    createIframe(`{versusUrl}`, "Versus - Music Battle", "favicon.ico");
 
     const menu = document.createElement("div");
     menu.id = "menu";
