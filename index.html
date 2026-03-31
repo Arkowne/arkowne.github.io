@@ -4,13 +4,17 @@
 <meta charset="UTF-8">
 <title>Versus - Playlist Battle</title>
 
+<!-- favicon par défaut -->
+<link id="favicon" rel="icon" href="https://www.google.com/favicon.ico">
+
 <style>
   html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* empêche le scroll vertical */
+    overflow: hidden;
+    font-family: Arial, sans-serif;
   }
 
   iframe {
@@ -20,6 +24,18 @@
     width: 100%;
     height: 100%;
     border: none;
+  }
+
+  #menu {
+    padding: 20px;
+  }
+
+  .link {
+    display: block;
+    margin: 10px 0;
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
   }
 </style>
 
@@ -31,19 +47,87 @@
   const page = params.get("page");
   const id   = params.get("id");
 
-  let iframeUrl = "";
+  const versusUrl = "https://college-compact-worldwide-weddings.trycloudflare.com";
 
-  if (page === "game") {
-    iframeUrl = "https://college-compact-worldwide-weddings.trycloudflare.com/game";
-  } else if (page === "load_quiz" && id) {
-    iframeUrl = `https://college-compact-worldwide-weddings.trycloudflare.com/load_quiz/${id}`;
-  } else {
-    iframeUrl = "https://arkowne.github.io/redirect.html";
+  // Config des pages (titre + icône + url)
+  const pages = {
+    game: {
+      title: "Game - Playlist Battle",
+      icon: "https://cdn-icons-png.flaticon.com/512/25/25231.png",
+      url: `${versusUrl}/game`
+    },
+    quiz: (id) => ({
+      title: `Quiz ${id} - Playlist Battle`,
+      icon: "https://cdn-icons-png.flaticon.com/512/2991/2991148.png",
+      url: `${versusUrl}/load_quiz/${id}`
+    })
+  };
+
+  function setMeta(title, iconUrl) {
+    document.title = title;
+
+    const favicon = document.getElementById("favicon");
+    favicon.href = iconUrl;
   }
 
-  const iframe = document.createElement("iframe");
-  iframe.src = iframeUrl;
-  document.body.appendChild(iframe);
+  function createIframe(url, title, icon) {
+    document.body.innerHTML = "";
+    setMeta(title, icon);
+
+    const iframe = document.createElement("iframe");
+    iframe.src = url;
+    document.body.appendChild(iframe);
+  }
+
+  // Navigation par URL
+  if (page === "game") {
+    const p = pages.game;
+    createIframe(p.url, p.title, p.icon);
+
+  } else if (page === "load_quiz" && id) {
+    const p = pages.quiz(id);
+    createIframe(p.url, p.title, p.icon);
+
+  } else {
+    // MENU
+    setMeta("Menu - Playlist Battle", "https://cdn-icons-png.flaticon.com/512/1828/1828859.png");
+
+    const menu = document.createElement("div");
+    menu.id = "menu";
+
+    const title = document.createElement("h2");
+    title.textContent = "Choisis une page :";
+    menu.appendChild(title);
+
+    const links = [
+      {
+        text: "Game",
+        ...pages.game
+      },
+      {
+        text: "Quiz 1",
+        ...pages.quiz(1)
+      },
+      {
+        text: "Quiz 2",
+        ...pages.quiz(2)
+      }
+    ];
+
+    links.forEach(link => {
+      const a = document.createElement("div");
+      a.className = "link";
+      a.textContent = link.text;
+
+      a.onclick = () => {
+        createIframe(link.url, link.title, link.icon);
+      };
+
+      menu.appendChild(a);
+    });
+
+    document.body.appendChild(menu);
+  }
 </script>
 
 </body>
